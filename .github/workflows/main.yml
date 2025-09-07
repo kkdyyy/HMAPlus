@@ -25,15 +25,23 @@ jobs:
           linux-headers-generic \
           libssl-dev \
           git \
-          # 安装 ARM64 交叉编译工具链（关键修复）
           gcc-aarch64-linux-gnu \
           binutils-aarch64-linux-gnu
 
-    - name: Configure cross-compiler (修复 TARGET_COMPILE)
+    - name: Configure cross-compiler
       run: |
-        # 手动设置交叉编译工具链路径（Ubuntu 预安装路径）
         echo "TARGET_COMPILE=/usr/bin/aarch64-linux-gnu-" >> $GITHUB_ENV
 
+    - name: Compile project
+      run: |
+        make clean
+        make
+
+    - name: Upload artifact (已升级到 v4)
+      uses: actions/upload-artifact@v4
+      with:
+        name: hmaplus-arm64-kpm
+        path: ./HMA++.kpm
     - name: Compile project
       run: |
         make clean
