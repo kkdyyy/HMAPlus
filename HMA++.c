@@ -13,7 +13,7 @@
 #include <uapi/linux/limits.h>   // For PATH_MAX
 #include <linux/kernel.h>   // For snprintf
 
-KPM_NAME("HMA++");
+KPM_NAME("HMA+++");
 KPM_VERSION("0.0.6");
 KPM_LICENSE("GPLv3");
 KPM_AUTHOR("kkdy");
