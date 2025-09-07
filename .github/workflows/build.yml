@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout source
       uses: actions/checkout@v4
 
     - name: Install ARM64 cross toolchain
@@ -25,9 +25,18 @@ jobs:
         cd kernel
         git checkout v3.8
 
-    - name: Build module
+    - name: Show kernel directories
       run: |
-        make TARGET_COMPILE=aarch64-none-elf- KP_DIR=$GITHUB_WORKSPACE/kernel
+        echo "Include dirs:"
+        ls -R kernel/include
+        ls -R kernel/arch/arm64/include
+
+    - name: Build module with detailed logs
+      run: |
+        # 覆盖 Makefile 的 TARGET_COMPILE 和 KP_DIR
+        make TARGET_COMPILE=$GITHUB_WORKSPACE/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf- \
+             KP_DIR=$GITHUB_WORKSPACE/kernel \
+             V=1 || (cat *.o || true; exit 1)
 
     - name: Upload .kpm artifact
       uses: actions/upload-artifact@v4
