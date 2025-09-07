@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4  # 升级到 v4 版本
 
     - name: Install system dependencies
       run: |
@@ -24,16 +24,26 @@ jobs:
           libtool \
           linux-headers-generic \
           libssl-dev \
-          git
+          git \
+          # 安装 ARM64 交叉编译工具链（关键修复）
+          gcc-aarch64-linux-gnu \
+          binutils-aarch64-linux-gnu
 
-    - name: Setup cross-compiler
-      uses: actions/setup-cross-compiler@v1
+    - name: Configure cross-compiler (修复 TARGET_COMPILE)
+      run: |
+        # 手动设置交叉编译工具链路径（Ubuntu 预安装路径）
+        echo "TARGET_COMPILE=/usr/bin/aarch64-linux-gnu-" >> $GITHUB_ENV
+
+    - name: Compile project
+      run: |
+        make clean
+        make  # 直接调用 Makefile，使用环境变量中的工具链
+
+    - name: Upload artifact (升级到 v4)
+      uses: actions/upload-artifact@v4  # 替换为 v4 版本
       with:
-        compiler: aarch64-none-elf-gcc
-        target: aarch64-none-elf
-        arch: arm64
-        triplet: aarch64-none-elf
-
+        name: hmaplus-arm64-kpm
+        path: ./HMA++.kpm
     - name: Compile project
       env:
         TARGET_COMPILE: /usr/bin/aarch64-none-elf-
