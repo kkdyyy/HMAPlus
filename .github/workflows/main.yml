@@ -1,31 +1,48 @@
-TARGET_COMPILE=/home/lshwjgpt/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf-
-ifndef TARGET_COMPILE
-    $(error TARGET_COMPILE not set)
-endif
+name: Cross-Compile ARM64 KPM
 
-ifndef KP_DIR
-    KP_DIR = ../..
-endif
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-CC = $(TARGET_COMPILE)gcc
-LD = $(TARGET_COMPILE)ld
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-INCLUDE_DIRS := . include patch/include linux/include linux/arch/arm64/include linux/tools/arch/arm64/include
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          autoconf \
+          automake \
+          libtool \
+          linux-headers-generic \
+          libssl-dev \
+          git
 
-INCLUDE_FLAGS := $(foreach dir,$(INCLUDE_DIRS),-I$(KP_DIR)/kernel/$(dir))
+    - name: Setup cross-compiler
+      uses: actions/setup-cross-compiler@v1
+      with:
+        compiler: aarch64-none-elf-gcc
+        target: aarch64-none-elf
+        arch: arm64
+        triplet: aarch64-none-elf
 
-objs := HMA++.o
+    - name: Compile project
+      env:
+        TARGET_COMPILE: /usr/bin/aarch64-none-elf-
+      run: |
+        make clean
+        make
 
-all: HMA++.kpm
-
-HMA++.kpm: ${objs}
-	${CC} -r -o $@ $^
-
-%.o: %.c
-	${CC} $(CFLAGS) $(INCLUDE_FLAGS) -c -O2 -o $@ $<
-
-.PHONY: clean
-clean:
-	rm -rf *.kpm
-	find . -name "*.o" | xargs rm -f
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: hmaplus-arm64-kpm
+        path: ./HMA++.kpm
