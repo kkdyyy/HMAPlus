@@ -13,11 +13,11 @@
 #include <uapi/linux/limits.h>   // For PATH_MAX
 #include <linux/kernel.h>   // For snprintf
 
-KPM_NAME("HMA++");
-KPM_VERSION("0.0.3");
+KPM_NAME("HMA+++");
+KPM_VERSION("0.0.6");
 KPM_LICENSE("GPLv3");
-KPM_AUTHOR("lshwjgpt");
-KPM_DESCRIPTION("TG频道:https://t.me/mizhipindao&TG群组:https://t.me/mizhichat");
+KPM_AUTHOR("kkdy");
+KPM_DESCRIPTION("二改自用版&勿传播");
 
 #define TARGET_PATH "/storage/emulated/0/Android/data/"
 #define TARGET_PATH_LEN (sizeof(TARGET_PATH) - 1)
